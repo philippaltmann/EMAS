@@ -1,0 +1,13 @@
+env:
+  classname:          marl_factory_grid.environment.configs.rl
+  env_name:           "rl/two_rooms_eval_config"
+  n_agents:           1 # Number of agents in the environment
+  eval_render:        True # If inference should be graphically visualized
+  save_and_log:       False # If configurations and potential logging files should be saved
+algorithm:
+  pile-order:         "fixed" # Clean dirt piles (=encoded flags) in a fixed order specified by the environment config (cf. coords_or_quantity)
+  pile-observability: "single" # Agent can only perceive one dirt pile at any given time step
+  pile_all_done:      "all" # During inference the episode ends only when all dirt piles are cleaned
+  auxiliary_piles:    False # Auxiliary piles are only differentiated from regular target piles during marl eval
+
+
