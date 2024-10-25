@@ -1,3 +1,4 @@
+import copy
 import shutil
 
 from collections import defaultdict
@@ -81,7 +82,7 @@ class Factory(gym.Env):
     def __init__(self, config_file: Union[str, PathLike], custom_modules_path: Union[None, PathLike] = None,
                  custom_level_path: Union[None, PathLike] = None):
         """
-        Initializes the marl-factory-grid as Gym environment.
+        Initializes the rl-factory-grid as Gym environment.
 
         :param config_file: Path to the configuration file.
         :type config_file: Union[str, PathLike]
@@ -100,6 +101,7 @@ class Factory(gym.Env):
 
         parsed_entities = self.conf.load_entities()
         self.map = LevelParser(self.level_filepath, parsed_entities, self.conf.pomdp_r)
+        self.levels_that_require_masking = ['two_rooms_small']
 
         # Init for later usage:
         # noinspection PyTypeChecker
@@ -109,6 +111,7 @@ class Factory(gym.Env):
 
         # expensive - don't use; unless required !
         self._renderer = None
+        self._recorder = None
 
         # Init entities
         entities = self.map.do_init()
@@ -270,28 +273,46 @@ class Factory(gym.Env):
         if not self._renderer:  # lazy init
             from marl_factory_grid.utils.renderer import Renderer
             global Renderer
-            self._renderer = Renderer(self.map.level_shape,  view_radius=self.conf.pomdp_r, fps=10)
+            self._renderer = Renderer(self.map.level_shape, view_radius=self.conf.pomdp_r, fps=10)
 
-        # Hide dirt piles where all dirt was cleaned
-        render_entities = self.state.entities.render()
-        if 'DirtPiles' in list(self.state.entities.keys()):
-            for pile in self.state.entities['DirtPiles']:
-                if pile.amount <= 0:
-                    render_entities = [entity for entity in render_entities if not (entity.name == 'DirtPiles' and entity.pos == pile.pos)]
+        # Remove potential Nones from entities
+        render_entities_full = self.state.entities.render()
 
-        # Mask dirt piles as Destinations (relevant for RL-agents) # TODO
-        if self.conf['General']['level_name'] == 'two_rooms':
-            if 'DirtPiles' in list(self.state.entities.keys()):
-                for entity in render_entities:
-                    if entity.name == 'DirtPiles':
-                        entity.name = 'Destinations'
-                        entity.value = 1
+        # Hide entities where certain conditions are met (e.g., amount <= 0 for DirtPiles)
+        maintain_indices = self.filter_entities(self.state.entities)
+        if maintain_indices:
+            render_entities = [render_entity for idx, render_entity in enumerate(render_entities_full) if idx in maintain_indices]
+        else:
+            render_entities = render_entities_full
+
+        # Mask entities based on dynamic conditions instead of hardcoding level-specific logic
+        if self.conf['General']['level_name'] in self.levels_that_require_masking:
+            render_entities = self.mask_entities(render_entities)
 
         if self.conf.pomdp_r:
             for render_entity in render_entities:
                 if render_entity.name == c.AGENT:
                     render_entity.aux = self.obs_builder.curr_lightmaps[render_entity.real_name]
-        return self._renderer.render(render_entities)
+        return self._renderer.render(render_entities, self._recorder)
+
+    def filter_entities(self, entities):
+        """ Generalized method to filter out entities that shouldn't be rendered. """
+        if 'CoinPiles' in self.state.entities.keys():
+            all_entities = [item for sublist in [[e for e in entity] for entity in entities] for item in sublist]
+            return [idx for idx, entity in enumerate(all_entities) if not ('CoinPile' in entity.name and entity.amount <= 0)]
+
+    def mask_entities(self, entities):
+        """ Generalized method to mask entities based on dynamic conditions. """
+        for entity in entities:
+            if entity.name == 'CoinPiles':
+                entity.name = 'Destinations'
+                entity.value = 1
+                #entity.mask = 'Destinations'
+                #entity.mask_value = 1
+        return entities
+
+    def set_recorder(self, recorder):
+        self._recorder = recorder
 
     def summarize_header(self):
         header = {'rec_step': self.state.curr_step}
@@ -308,7 +329,7 @@ class Factory(gym.Env):
             summary.update({entity_group.name.lower(): entity_group.summarize_states()})
         # TODO Section End                                                          ########
         for key in list(summary.keys()):
-            if key not in ['step', 'walls', 'doors', 'agents', 'items', 'dirtPiles', 'batteries']:
+            if key not in ['step', 'walls', 'doors', 'agents', 'items', 'dirtPiles', 'batteries', 'coinPiles']:
                 del summary[key]
         return summary
 

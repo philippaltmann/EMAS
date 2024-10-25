@@ -1,41 +1,39 @@
-from marl_factory_grid.algorithms.rl.RL_runner import rerun_dirt_quadrant_agent1_training, \
-    rerun_two_rooms_agent1_training, rerun_two_rooms_agent2_training, dirt_quadrant_multi_agent_rl_eval, \
+from marl_factory_grid.algorithms.marl.RL_runner import rerun_coin_quadrant_agent1_training, \
+    rerun_two_rooms_agent1_training, rerun_two_rooms_agent2_training, coin_quadrant_multi_agent_rl_eval, \
     two_rooms_multi_agent_rl_eval
-from marl_factory_grid.algorithms.tsp.TSP_runner import dirt_quadrant_multi_agent_tsp_eval, \
+from marl_factory_grid.algorithms.static.TSP_runner import coin_quadrant_multi_agent_tsp_eval, \
     two_rooms_multi_agent_tsp_eval
 
 
 ###### Coin-quadrant environment ######
 def coin_quadrant_single_agent_training():
-    """ Rerun training of RL-agent in coins_quadrant (dirt_quadrant) environment.
-        The trained model and additional training metrics are saved in the study_out folder. """
-    rerun_dirt_quadrant_agent1_training()
+    """ Rerun training of RL-agent in coins_quadrant environment.
+    The trained model and additional training metrics are saved in the study_out folder. """
+    rerun_coin_quadrant_agent1_training()
 
 
 def coin_quadrant_RL_multi_agent_eval_emergent():
-    """ Rerun multi-agent evaluation of RL-agents in coins_quadrant (dirt_quadrant)
-        environment, with occurring emergent phenomenon. Evaluation takes trained models
-        from study_out/run0 for both agents."""
-    dirt_quadrant_multi_agent_rl_eval(emergent_phenomenon=True)
+    """ Rerun multi-agent evaluation of RL-agents in coins_quadrant environment,
+    with occurring emergent phenomenon. Evaluation takes trained models from study_out/run0 for both agents."""
+    coin_quadrant_multi_agent_rl_eval(emergent_phenomenon=True)
 
 
 def coin_quadrant_RL_multi_agent_eval_prevented():
-    """ Rerun multi-agent evaluation of RL-agents in coins_quadrant (dirt_quadrant)
-        environment, with emergence prevention mechanism. Evaluation takes trained models
-        from study_out/run0 for both agents."""
-    dirt_quadrant_multi_agent_rl_eval(emergent_phenomenon=False)
+    """ Rerun multi-agent evaluation of RL-agents in coins_quadrant environment,
+    with emergence prevention mechanism. Evaluation takes trained models from study_out/run0 for both agents."""
+    coin_quadrant_multi_agent_rl_eval(emergent_phenomenon=False)
 
 
 def coin_quadrant_TSP_multi_agent_eval_emergent():
-    """ Rerun multi-agent evaluation of TSP-agents in coins_quadrant (dirt_quadrant)
-        environment, with occurring emergent phenomenon. """
-    dirt_quadrant_multi_agent_tsp_eval(emergent_phenomenon=True)
+    """ Rerun multi-agent evaluation of TSP-agents in coins_quadrant environment,
+    with occurring emergent phenomenon. """
+    coin_quadrant_multi_agent_tsp_eval(emergent_phenomenon=True)
 
 
 def coin_quadrant_TSP_multi_agent_eval_prevented():
-    """ Rerun multi-agent evaluation of TSP-agents in coins_quadrant (dirt_quadrant)
-        environment, with emergence prevention mechanism. """
-    dirt_quadrant_multi_agent_tsp_eval(emergent_phenomenon=False)
+    """ Rerun multi-agent evaluation of TSP-agents in coins_quadrant environment,
+    with emergence prevention mechanism. """
+    coin_quadrant_multi_agent_tsp_eval(emergent_phenomenon=False)
 
 
 ###### Two-rooms environment ######
@@ -81,4 +79,4 @@ def two_rooms_TSP_multi_agent_eval_prevented():
 if __name__ == '__main__':
     # Select any of the above functions to rerun the respective part
     #  from our evaluation section of the paper
-    coin_quadrant_single_agent_training()
+    coin_quadrant_RL_multi_agent_eval_prevented()
