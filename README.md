@@ -1,6 +1,9 @@
 # Emergence in Multi-Agent Systems: A Safety Perspective
 
-|[![arXiv](https://img.shields.io/badge/arXiv-2408.04514-b31b1b.svg?logo=arxiv&logoColor=white)](https://arxiv.org/abs/2408.04514)| | |
+[![DOI:10.1007/978-3-031-75107-3_7](https://zenodo.org/badge/doi/10.1007/978-3-031-75107-3_7.svg)](https://doi.org/10.1007/978-3-031-75107-3_7)
+[![arXiv](https://img.shields.io/badge/arXiv-2408.04514-b31b1b.svg?logo=arxiv&logoColor=white)](https://arxiv.org/abs/2408.04514)
+
+| | | |
 |-|-|-|
 |&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;|![EMAS Conceptual Process Model](images/EMAS.png)|&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;|
 
